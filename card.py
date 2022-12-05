@@ -16,17 +16,21 @@ class Card:
         self.name = None
         self.cost = None
         self.attack = None
-        self.defend = None
+        self.defense = None
         # TODO: More
 
-    def stat_str(self, cost=True, attack=True, defend=True):
+    def stat_str(self, cost=True, attack=True, defense=True):
         stat_str = f"<{self.name}> "
+        if self.playable:
+            stat_str += "[*] "
+        else:
+            stat_str += "[X] "
         if cost:
-            stat_str += f"COST: {self.COST} | "
+            stat_str += f"COST: {self.cost} | "
         if attack:
             stat_str += f"ATK: {self.attack} | "
-        if defend:
-            stat_str += f"DEF: {self.defend} | "
+        if defense:
+            stat_str += f"DEF: {self.defense} | "
         return stat_str
 
 class BasicAttack(Card):
@@ -35,16 +39,19 @@ class BasicAttack(Card):
         self.name = "Basic Attack"
         self.attack = 6
         self.cost = 1
+        self.playable = True
 
 class BasicDefend(Card):
     def __init__(self):
         super().__init__()
         self.name = "Basic Defend"
-        self.defend = 5
+        self.defense = 5
         self.cost = 1
+        self.playable = True
 
 class Hesitation(Card):
     def __init__(self):
         super().__init__()
         self.name = "Hesitation"
+        self.playable = False
 

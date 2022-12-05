@@ -1,20 +1,63 @@
 from constants import *
 import card
+import random
 
 class Player:
     def __init__(self):
-        self.deck = card.build_starter_deck()
+        self.name = "Player"
+        self.hand = []
+        self.draw = card.build_starter_deck()
         self.discard = []
         self.hp = STARTING_HP
         self.max_hp = STARTING_HP
         self.energy = STARTING_ENERGY
         self.max_energy = STARTING_ENERGY
-        self.defend = 0
+        self.defense = 0
+
+    def stat_str(self):
+        return f"<{self.name}> HP: {self.hp}/{self.max_hp} | DEF: {self.defense} | ENERGY: {self.energy}/{self.max_energy}"
+
+    def reshuffle(self):
+        assert len(self.draw) == 0
+        while len(self.discard) > 0:
+            c = self.discard.pop()
+            self.draw.append(c)
+        random.shuffle(self.draw)
+
+    def change_hp(self, amt):
+        self.hp += amt
+        if self.hp > self.max_hp:
+            self.hp = self.max_hp
+        elif self.hp < 0:
+            self.hp = 0
+    
+    def change_defense(self, amt):
+        self.defense += amt
+        if self.defense < 0:
+            self.defense = 0
+
+    def change_energy(self, amt):
+        self.energy += amt
+
+    def discard_hand(self):
+        while len(self.hand) > 0:
+            card_to_discard = self.hand.pop()
+            self.discard.append(card_to_discard)
+
+    def draw_hand(self):
+        for i in range(BASE_DRAW_AMOUNT):
+            if len(self.draw) == 0:
+                self.reshuffle()
+            drawn = self.draw.pop()
+            self.hand.append(drawn)
+
+    def is_alive(self):
+        return self.hp > 0
 
     def print_deck(self, names_only=True):
-        for card in self.deck:
+        for card in self.draw:
             if names_only:
-                print(card.stat_str(cost=False, attack=False, defend=False))
+                print(card.stat_str(cost=False, attack=False, defense=False))
             else:
                 print(card.stat_str())
 
