@@ -105,7 +105,7 @@ class ArenaCards: # I suppose in the Kivy version this will subclass App!
             elif pick == RewardType.GAIN_CARD:
                 self.gain_card_loop()
             elif pick == RewardType.HEAL:
-                heal_amt = utility.generate_fuzzed_value(BASE_HEAL_AMOUNT, HEAL_FUZZ_MULTIPLIER)
+                heal_amt = utility.generate_fuzzed_value(constants.BASE_HEAL_AMOUNT, constants.HEAL_FUZZ_MULTIPLIER)
                 self.player.change_hp(heal_amt)
                 print(f"{self.player.name} heals for {heal_amt} HP!")
             break
@@ -114,10 +114,12 @@ class ArenaCards: # I suppose in the Kivy version this will subclass App!
         self.current_stage = self.stage_graph[0]
         while not self.player_wins():
             input(f"ENTER to begin stage #{self.stages_cleared + 1}")
+            check = self.player.total_cards_amt()
             self.current_stage.contents.battle()
+            assert check == self.player.total_cards_amt()
             self.stages_cleared += 1
             self.rewards_loop()
-            self.current_stage = self.self.current_stage.next_node
+            self.current_stage = self.current_stage.next_node
         print("You beat every stage!")
 
 if __name__ == "__main__":

@@ -14,6 +14,9 @@ class Player:
         self.max_energy = STARTING_ENERGY
         self.defense = 0
 
+    def total_cards_amt(self):
+        return len(self.hand) + len(self.draw) + len(self.discard)
+
     def stat_str(self):
         return f"<{self.name}> HP: {self.hp}/{self.max_hp} | DEF: {self.defense} | ENERGY: {self.energy}/{self.max_energy}"
 
