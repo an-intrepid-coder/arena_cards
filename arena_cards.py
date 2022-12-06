@@ -6,12 +6,13 @@ import constants
 from enum import Enum
 import random
 import card
+import utility
 
 class RewardType(Enum):
     REMOVE_CARD = 0
     UPGRADE_CARD = 1
     GAIN_CARD = 2
-    # TODO: way more reward types
+    HEAL = 3
 
 class ArenaCards: # I suppose in the Kivy version this will subclass App!
     def __init__(self):
@@ -25,8 +26,7 @@ class ArenaCards: # I suppose in the Kivy version this will subclass App!
 
     # Returns two reward types in a tuple out of all possible reward types:
     def generate_rewards(self):
-        # TODO: Influence the rewards by the number of stages cleared
-        rewards = [RewardType.REMOVE_CARD, RewardType.UPGRADE_CARD, RewardType.GAIN_CARD]
+        rewards = [RewardType.REMOVE_CARD, RewardType.UPGRADE_CARD, RewardType.GAIN_CARD, RewardType.HEAL]
         random.shuffle(rewards)
         first_pick = rewards.pop()
         second_pick = rewards.pop()
@@ -104,7 +104,10 @@ class ArenaCards: # I suppose in the Kivy version this will subclass App!
                 self.remove_card_loop()
             elif pick == RewardType.GAIN_CARD:
                 self.gain_card_loop()
-                pass
+            elif pick == RewardType.HEAL:
+                heal_amt = utility.generate_fuzzed_value(BASE_HEAL_AMOUNT, HEAL_FUZZ_MULTIPLIER)
+                self.player.change_hp(heal_amt)
+                print(f"{self.player.name} heals for {heal_amt} HP!")
             break
 
     def play(self):
