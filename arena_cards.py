@@ -52,6 +52,7 @@ class ArenaCards: # I suppose in the Kivy version this will subclass App!
 
     def remove_card_loop(self):
         count = 1
+        assert len(self.player.draw) == self.player.total_cards_amt() # as suspected...
         for entry in self.player.draw:
             print(f"({count}) {entry.stat_str()}")
             count += 1

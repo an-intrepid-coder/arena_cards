@@ -1,6 +1,6 @@
-from constants import *
 import card
 import random
+import constants
 
 class Player:
     def __init__(self):
@@ -8,10 +8,10 @@ class Player:
         self.hand = []
         self.draw = card.build_starter_deck()
         self.discard = []
-        self.hp = STARTING_HP
-        self.max_hp = STARTING_HP
-        self.energy = STARTING_ENERGY
-        self.max_energy = STARTING_ENERGY
+        self.hp = constants.STARTING_HP
+        self.max_hp = constants.STARTING_HP
+        self.energy = constants.STARTING_ENERGY
+        self.max_energy = constants.STARTING_ENERGY
         self.defense = 0
 
     def total_cards_amt(self):
@@ -48,7 +48,7 @@ class Player:
             self.discard.append(card_to_discard)
 
     def draw_hand(self):
-        for i in range(BASE_DRAW_AMOUNT):
+        for i in range(constants.BASE_DRAW_AMOUNT):
             if len(self.draw) == 0:
                 self.reshuffle()
             drawn = self.draw.pop()
@@ -59,10 +59,10 @@ class Player:
 
     # Puts everything back in the draw pile and shuffles it:
     def reset_deck(self):
-        for entry in self.hand:
+        while len(self.hand) > 0:
             yoink = self.hand.pop()
             self.draw.append(yoink)
-        for entry in self.discard:
+        while len(self.discard) > 0:
             yoink = self.discard.pop()
             self.draw.append(yoink)
         random.shuffle(self.draw)

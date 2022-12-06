@@ -1,4 +1,4 @@
-from constants import *
+import constants
 import utility
 import card
 import random
@@ -42,7 +42,7 @@ class RookieBrawler(Enemy):
     def __init__(self):
         super().__init__()
         self.name = "Rookie Brawler"
-        hp = utility.generate_fuzzed_value(16, HP_FUZZ_MULTIPLIER) 
+        hp = utility.generate_fuzzed_value(16, constants.HP_FUZZ_MULTIPLIER) 
         self.hp = hp
         self.max_hp = hp
         self.defense = 0
@@ -52,7 +52,7 @@ class Brawler(Enemy):
     def __init__(self):
         super().__init__()
         self.name = "Brawler"
-        hp = utility.generate_fuzzed_value(25, HP_FUZZ_MULTIPLIER) 
+        hp = utility.generate_fuzzed_value(25, constants.HP_FUZZ_MULTIPLIER) 
         self.hp = hp
         self.max_hp = hp
         self.defense = 0
@@ -62,7 +62,7 @@ class CarefulBrawler(Enemy):
     def __init__(self):
         super().__init__()
         self.name = "Careful Brawler"
-        hp = utility.generate_fuzzed_value(25, HP_FUZZ_MULTIPLIER) 
+        hp = utility.generate_fuzzed_value(25, constants.HP_FUZZ_MULTIPLIER) 
         self.hp = hp
         self.max_hp = hp
         self.defense = 0
@@ -75,7 +75,7 @@ class AggroBrawler(Enemy):
     def __init__(self):
         super().__init__()
         self.name = "Aggro Brawler"
-        hp = utility.generate_fuzzed_value(25, HP_FUZZ_MULTIPLIER) 
+        hp = utility.generate_fuzzed_value(25, constants.HP_FUZZ_MULTIPLIER) 
         self.hp = hp
         self.max_hp = hp
         self.defense = 0

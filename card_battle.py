@@ -4,8 +4,7 @@ import constants
 
 # TEST CASE: (but will be basis for stage template)
 class CardBattle:
-    def __init__(self, player, enemies): # TODO: More params
-        # TODO: Actual stage generation
+    def __init__(self, player, enemies): 
         self.player = player
         self.enemies = enemies
         self.turn = 1
@@ -40,7 +39,7 @@ class CardBattle:
             print(f"[{count}] {e.stat_str()} [{action_str}])")
             count += 1
 
-    # Returns False is the player ended their turn
+    # Returns False if the player ended their turn
     def handle_input(self):
         while True:
             which_card = input("Enter # of card to play or (e)nd turn: ")
@@ -147,9 +146,7 @@ class StageGraphNode:
         self.prev_node = prev_node
         self.next_node = next_node
 
-# For now, just ten stages in sequence
 def generate_stage_graph(player):
-    # TODO: Multi-branched stage graphs
     root = StageGraphNode(CardBattle(player, enemy.generate_enemies(stage=1)), None, None)
     graph = [root]
     for i in range(constants.NUM_STAGES):
