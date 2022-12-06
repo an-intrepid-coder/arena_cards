@@ -35,6 +35,8 @@ class CardBattle:
             action_str = "None"
             if e.action is not None:
                 action_str = e.action.name
+            if e.action.attack is not None:
+                action_str += f" ({e.action.attack})"
             print(f"[{count}] {e.stat_str()} [{action_str}])")
             count += 1
 
