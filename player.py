@@ -54,10 +54,28 @@ class Player:
     def is_alive(self):
         return self.hp > 0
 
+    # Puts everything back in the draw pile and shuffles it:
+    def reset_deck(self):
+        for entry in self.hand:
+            yoink = self.hand.pop()
+            self.draw.append(yoink)
+        for entry in self.discard:
+            yoink = self.discard.pop()
+            self.draw.append(yoink)
+        random.shuffle(self.draw)
+
+    # Returns a list of the cards which may be upgraded:
+    def get_upgradeable_cards(self): 
+        upgradeable = []
+        for card in self.draw:
+            if card.upgradeable:
+                upgradeable.append(card) 
+        return upgradeable
+
     def print_deck(self, names_only=True):
         for card in self.draw:
             if names_only:
-                print(card.stat_str(cost=False, attack=False, defense=False))
+                print(card.stat_str(cost=False, attack=False, defense=False, level=False))
             else:
                 print(card.stat_str())
 

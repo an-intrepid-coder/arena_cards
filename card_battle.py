@@ -32,7 +32,10 @@ class CardBattle:
     def print_enemies(self):
         count = 1
         for e in self.enemies:
-            print(f"[{count}] {e.stat_str()} [{e.action.name}])")
+            action_str = "None"
+            if e.action is not None:
+                action_str = e.action.name
+            print(f"[{count}] {e.stat_str()} [{action_str}])")
             count += 1
 
     # Returns False is the player ended their turn
@@ -56,22 +59,33 @@ class CardBattle:
                 print("Not enough energy to play this card this turn!")
                 continue
             if card_to_play.attack is not None:
-                which_enemy = input("Enter # of enemy to attack: ")
-                index = int(which_enemy) - 1
-                if index >= len(self.enemies) or index < 0:
-                    print("Invalid selection!")
-                    continue
-                target = self.enemies[index]
-                if not target.is_alive():
-                    print("Target is already dead!")
-                    continue
-                raw_dmg = card_to_play.attack
-                dmg = raw_dmg - target.defense
-                if dmg < 0:
-                    dmg = 0
-                target.change_hp(-dmg)
-                target.change_defense(-raw_dmg)
-                print(f"{target.name} is struck for {dmg} dmg!")
+                if card_to_play.aoe is None:
+                    which_enemy = input("Enter # of enemy to attack: ")
+                    index = int(which_enemy) - 1
+                    if index >= len(self.enemies) or index < 0:
+                        print("Invalid selection!")
+                        continue
+                    target = self.enemies[index]
+                    if not target.is_alive():
+                        print("Target is already dead!")
+                        continue
+                    raw_dmg = card_to_play.attack
+                    dmg = raw_dmg - target.defense
+                    if dmg < 0:
+                        dmg = 0
+                    target.change_hp(-dmg)
+                    target.change_defense(-raw_dmg)
+                    print(f"{target.name} is struck for {dmg} dmg!")
+                else:
+                    for target in self.enemies:
+                        if target.is_alive():
+                            raw_dmg = card_to_play.attack
+                            dmg = raw_dmg - target.defense
+                            if dmg < 0:
+                                dmg = 0
+                            target.change_hp(-dmg)
+                            target.change_defense(-raw_dmg)
+                            print(f"{target.name} is struck for {dmg} dmg!")
             if card_to_play.defense is not None:
                 self.player.change_defense(card_to_play.defense)
                 print(f"{self.player.name} prepares {card_to_play.defense} defense!")
@@ -100,10 +114,11 @@ class CardBattle:
                 else:
                     print(f"{e.name} uses {card_to_play.name}")
 
-    def battle(self): # TODO: background/automated modes
+    def battle(self): 
+        self.player.reset_deck()
         # Player always goes first
-        while not (self.battle_won() or self.game_over()):
-            for entry in self.enemies: # TODO: Random initiative
+        while not (self.battle_won() or self.game_over()): 
+            for entry in self.enemies: 
                 if entry.is_alive():
                     entry.pick_action()
                 else:
@@ -122,6 +137,7 @@ class CardBattle:
             self.player.discard_hand()
             self.enemy_actions()
             self.turn += 1
+        self.player.reset_deck()
 
 class StageGraphNode:
     def __init__(self, contents, prev_node, next_node):

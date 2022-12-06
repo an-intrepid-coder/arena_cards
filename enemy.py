@@ -41,17 +41,55 @@ class Enemy:
 class RookieBrawler(Enemy):
     def __init__(self):
         super().__init__()
-        self.name = "Brawler"
-        hp = utility.generate_fuzzed_value(42, HP_FUZZ_MULTIPLIER)
+        self.name = "Rookie Brawler"
+        hp = utility.generate_fuzzed_value(25, HP_FUZZ_MULTIPLIER) 
         self.hp = hp
         self.max_hp = hp
         self.defense = 0
         self.hand = [card.BasicAttack(), card.BasicAttack(), card.BasicAttack(), card.BasicDefend(), card.Hesitation()]
 
-def generate_enemies(stage): # TODO: Vary enemies by stage
+class Brawler(Enemy):
+    def __init__(self):
+        super().__init__()
+        self.name = "Brawler"
+        hp = utility.generate_fuzzed_value(40, HP_FUZZ_MULTIPLIER) 
+        self.hp = hp
+        self.max_hp = hp
+        self.defense = 0
+        self.hand = [card.BasicAttack(), card.BasicAttack(), card.BasicAttack(), card.BasicDefend()]
+
+class CarefulBrawler(Enemy):
+    def __init__(self):
+        super().__init__()
+        self.name = "Careful Brawler"
+        hp = utility.generate_fuzzed_value(40, HP_FUZZ_MULTIPLIER) 
+        self.hp = hp
+        self.max_hp = hp
+        self.defense = 0
+        self.hand = [card.BasicAttack(), card.BasicAttack(), card.BasicDefend(), card.BasicDefend()]
+        for lvl in range(5):
+            self.hand[2].upgrade()
+            self.hand[3].upgrade()
+
+class AggroBrawler(Enemy):
+    def __init__(self):
+        super().__init__()
+        self.name = "Aggro Brawler"
+        hp = utility.generate_fuzzed_value(40, HP_FUZZ_MULTIPLIER) 
+        self.hp = hp
+        self.max_hp = hp
+        self.defense = 0
+        self.hand = [card.BasicAttack(), card.BasicAttack(), card.BasicAttack(), card.BasicAttack()]
+        for lvl in range(5):
+            if lvl < 3:
+                self.hand[2].upgrade()
+            self.hand[3].upgrade()
+
+def generate_enemies(stage): # TODO: Vary enemies by stage level
     num_enemies = random.randrange(1, 4)
     enemy_list = []
     for e in range(num_enemies):
-        enemy_list.append(RookieBrawler())
+        choices = [RookieBrawler(), Brawler(), CarefulBrawler(), AggroBrawler()]
+        enemy_list.append(random.choice(choices))
     return enemy_list
 
