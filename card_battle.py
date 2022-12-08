@@ -1,34 +1,37 @@
 import player
 import enemy
 import constants
+import curses
 
 # TEST CASE: (but will be basis for stage template)
 class CardBattle:
-    def __init__(self, player, enemies): 
+    def __init__(self, player, enemies, stdscr): 
         self.player = player
         self.enemies = enemies
         self.turn = 1
+        self.stdscr = stdscr
        
     def battle_won(self):
         for enemy in self.enemies:
             if enemy.is_alive():
                 return False
-        print("You won the battle!")
         return True 
 
     def game_over(self):
         if not self.player.is_alive():
-            print("You won the battle!")
             return True
         return False
 
-    def print_hand(self):
+    def get_hand_str_list(self):
+        hand_str_list = []
         count = 1
         for c in self.player.hand:
-            print(f"[{count}] {c.stat_str()})")
+            hand_str_list.append(f"[{count}] {c.stat_str()}")
             count += 1
+        return hand_str_list
 
-    def print_enemies(self):
+    def get_enemy_str_list(self):
+        enemy_str_list = []
         count = 1
         for e in self.enemies:
             action_str = "None"
@@ -36,39 +39,54 @@ class CardBattle:
                 action_str = e.action.name
                 if e.action.attack is not None:
                     action_str += f" ({e.action.attack})"
-            print(f"[{count}] {e.stat_str()} [{action_str}])")
+            enemy_str_list.append(f"[{count}] {e.stat_str()} [{action_str}]")
             count += 1
+        return enemy_str_list
+
+    def clear_prompt_lines(self):
+        maxyx = self.stdscr.getmaxyx()
+        line = constants.PROMPT_LINE
+        while line < maxyx[0]:
+            blank = ""
+            for x in range(maxyx[1] - 1):
+                blank += " "
+            self.stdscr.addstr(line, 0, blank)
+            line += 1
 
     # Returns False if the player ended their turn
     def handle_input(self):
         while True:
-            which_card = input("Enter # of card to play or (e)nd turn: ")
-            if which_card == "e":
+            maxyx = self.stdscr.getmaxyx()
+            y = 13
+            #which_card = input("Enter # of card to play or (e)nd turn: ")
+            prompt = "# of card to play or (e)nd turn"
+            x = int(maxyx[1] / 2 - len(prompt) /2)
+            self.stdscr.addstr(y, x, prompt)
+            which_card = self.stdscr.getch()
+            if which_card == ord('e'):
                 return False
-            if not which_card.isdecimal(): 
-                print("Invalid selection!")
+            if not which_card in range(48, 58):
                 continue
-            index = int(which_card) - 1
+            index = int(chr(which_card)) - 1
             if index >= len(self.player.hand) or index < 0:
-                print("Invalid selection!")
                 continue
             card_to_play = self.player.hand[index]
             if not card_to_play.playable:
-                print("That card is not playable!")
                 continue
             if card_to_play.cost > self.player.energy:
-                print("Not enough energy to play this card this turn!")
                 continue
             if card_to_play.attack is not None:
                 if card_to_play.aoe is None:
-                    which_enemy = input("Enter # of enemy to attack: ")
-                    index = int(which_enemy) - 1
+                    self.clear_prompt_lines()
+                    prompt = "enter # of enemy to attack"
+                    x = int(maxyx[1] / 2 - len(prompt) /2)
+                    self.stdscr.addstr(y, x, prompt)
+                    which_enemy = self.stdscr.getch()
+                    index = int(chr(which_enemy)) - 1
                     if index >= len(self.enemies) or index < 0:
-                        print("Invalid selection!")
                         continue
                     target = self.enemies[index]
                     if not target.is_alive():
-                        print("Target is already dead!")
                         continue
                     raw_dmg = card_to_play.attack
                     dmg = raw_dmg - target.defense
@@ -76,27 +94,28 @@ class CardBattle:
                         dmg = 0
                     target.change_hp(-dmg)
                     target.change_defense(-raw_dmg)
-                    print(f"{target.name} is struck for {dmg} dmg!")
                 else:
+                    dmgs = []
                     for target in self.enemies:
                         if target.is_alive():
                             raw_dmg = card_to_play.attack
                             dmg = raw_dmg - target.defense
+                            dmgs.append(dmg)
                             if dmg < 0:
                                 dmg = 0
                             target.change_hp(-dmg)
                             target.change_defense(-raw_dmg)
-                            print(f"{target.name} is struck for {dmg} dmg!")
             if card_to_play.defense is not None:
                 self.player.change_defense(card_to_play.defense)
-                print(f"{self.player.name} prepares {card_to_play.defense} defense!")
             break
         self.player.change_energy(-card_to_play.cost)
         self.player.hand.remove(card_to_play)
         self.player.discard.append(card_to_play)
         return True
 
+    # Returns a list of strings with the damage alerts:
     def enemy_actions(self):
+        dmg_alerts = []
         for e in self.enemies:
             if e.is_alive():
                 e.defense = 0
@@ -108,16 +127,52 @@ class CardBattle:
                         dmg = 0
                     self.player.change_hp(-dmg)
                     self.player.change_defense(-raw_dmg)
-                    print(f"{self.player.name} is struck for {dmg} dmg!")
+                    dmg_alerts.append(f"{self.player.name} was struck for {dmg} dmg!")
                 if card_to_play.defense is not None:
                     e.change_defense(card_to_play.defense)
-                    print(f"{e.name} prepares {card_to_play.defense} defense!")
-                else:
-                    print(f"{e.name} uses {card_to_play.name}")
+                    dmg_alerts.append(f"{e.name} prepares {card_to_play.defense} defense!")
+        return dmg_alerts
+
+    def display_battle(self, dmg_alerts):
+        self.stdscr.clear()
+        maxyx = self.stdscr.getmaxyx()
+        
+        y = 0
+        turn_str = f"Turn {self.turn}:"
+        x = int(maxyx[1] / 2 - len(turn_str) / 2)
+        self.stdscr.addstr(y, x, turn_str)
+
+        y += 1
+        player_str = f"{self.player.stat_str()}"
+        x = int(maxyx[1] / 2 - len(player_str) / 2)
+        self.stdscr.addstr(y, x, player_str)
+
+        hand_str_list = self.get_hand_str_list()
+        for entry in hand_str_list:
+            x = int(maxyx[1] / 2 - len(entry) / 2)
+            y += 1
+            self.stdscr.addstr(y, x, entry)
+
+        y += 1
+       
+        enemy_str_list = self.get_enemy_str_list() 
+        for entry in enemy_str_list:
+            x = int(maxyx[1] / 2 - len(entry) / 2)
+            y += 1
+            self.stdscr.addstr(y, x, entry)
+
+        y = constants.PROMPT_LINE + 2
+        for entry in dmg_alerts:
+            x = int(maxyx[1] / 2 - len(entry) / 2)
+            y += 1
+            self.stdscr.addstr(y, x, entry)
+
+        self.stdscr.refresh()
 
     def battle(self): 
         self.player.reset_deck()
         # Player always goes first
+        dmg_alerts = []
         while not (self.battle_won() or self.game_over()): 
             for entry in self.enemies: 
                 if entry.is_alive():
@@ -128,15 +183,12 @@ class CardBattle:
             self.player.energy = self.player.max_energy
             self.player.draw_hand()
             while True:
-                print(f"Turn {self.turn}:")
-                print(self.player.stat_str())
-                self.print_hand()
-                print("------")
-                self.print_enemies()
+                self.display_battle(dmg_alerts)
                 if not self.handle_input():
                     break
+                
             self.player.discard_hand()
-            self.enemy_actions()
+            dmg_alerts = self.enemy_actions()
             self.turn += 1
         self.player.reset_deck()
 
@@ -146,12 +198,12 @@ class StageGraphNode:
         self.prev_node = prev_node
         self.next_node = next_node
 
-def generate_stage_graph(player):
-    root = StageGraphNode(CardBattle(player, enemy.generate_enemies(stage=1)), None, None)
+def generate_stage_graph(player, stdscr):
+    root = StageGraphNode(CardBattle(player, enemy.generate_enemies(stage=1), stdscr), None, None)
     graph = [root]
     for i in range(constants.NUM_STAGES):
         stage_level = i + 1
-        next_stage = CardBattle(player, enemy.generate_enemies(stage_level))
+        next_stage = CardBattle(player, enemy.generate_enemies(stage_level), stdscr)
         next_node = StageGraphNode(next_stage, graph[i], None)
         graph[i].next_node = next_node
         graph.append(next_node)

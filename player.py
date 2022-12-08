@@ -18,7 +18,7 @@ class Player:
         return len(self.hand) + len(self.draw) + len(self.discard)
 
     def stat_str(self):
-        return f"<{self.name}> HP: {self.hp}/{self.max_hp} | DEF: {self.defense} | ENERGY: {self.energy}/{self.max_energy}"
+        return f"<{self.name}> HP: {self.hp}/{self.max_hp} DEF: {self.defense} ENERGY: {self.energy}/{self.max_energy}"
 
     def reshuffle(self):
         assert len(self.draw) == 0
@@ -74,11 +74,4 @@ class Player:
             if card.upgradeable:
                 upgradeable.append(card) 
         return upgradeable
-
-    def print_deck(self, names_only=True):
-        for card in self.draw:
-            if names_only:
-                print(card.stat_str(cost=False, attack=False, defense=False, level=False))
-            else:
-                print(card.stat_str())
 

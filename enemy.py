@@ -84,12 +84,12 @@ class AggroBrawler(Enemy):
             self.hand[2].upgrade()
             self.hand[3].upgrade()
 
-def generate_enemies(stage): 
+def generate_enemies(stage):  
     enemy_min = 1
-    enemy_max = 2
+    enemy_max = 3
     if stage > 3:
         enemy_max += 1
-    num_enemies = random.randrange(1, 4)
+    num_enemies = random.randrange(enemy_min, enemy_max)
     enemy_list = []
     for e in range(num_enemies):
         choices = [RookieBrawler(), Brawler(), CarefulBrawler(), AggroBrawler()]

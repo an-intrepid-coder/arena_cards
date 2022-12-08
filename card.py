@@ -27,17 +27,15 @@ class Card:
         else:
             stat_str += "[X] "
         if level:
-            stat_str += f"LVL: {self.level} | "
+            stat_str += f"LVL: {self.level} "
         if cost:
-            stat_str += f"COST: {self.cost} | "
+            stat_str += f"COST: {self.cost} "
         if attack:
-            stat_str += f"ATK: {self.attack}"
+            stat_str += f"ATK: {self.attack} "
             if self.aoe:
-                stat_str += " (AoE) | "
-            else:
-                stat_str += " | "
+                stat_str += "(AoE) "
         if defense:
-            stat_str += f"DEF: {self.defense} | "
+            stat_str += f"DEF: {self.defense} "
         return stat_str
 
 class BasicAttack(Card):

@@ -1,4 +1,5 @@
 import random
+import curses
 
 def generate_fuzzed_value(base, fuzz_multiplier):
         val = base
