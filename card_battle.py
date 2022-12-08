@@ -60,7 +60,7 @@ class CardBattle:
             y = 13
             #which_card = input("Enter # of card to play or (e)nd turn: ")
             prompt = "# of card to play or (e)nd turn"
-            x = int(maxyx[1] / 2 - len(prompt) / 2)
+            x = maxyx[1] // 2 - len(prompt) // 2
             self.stdscr.addstr(y, x, prompt)
             which_card = self.stdscr.getch()
             if which_card == ord('e'):
@@ -79,7 +79,7 @@ class CardBattle:
                 if card_to_play.aoe is None:
                     self.clear_prompt_lines()
                     prompt = "enter # of enemy to attack"
-                    x = int(maxyx[1] / 2 - len(prompt) /2)
+                    x = maxyx[1] // 2 - len(prompt) // 2
                     self.stdscr.addstr(y, x, prompt)
                     which_enemy = self.stdscr.getch()
                     index = int(chr(which_enemy)) - 1
@@ -139,17 +139,17 @@ class CardBattle:
         
         y = 0
         turn_str = f"Turn {self.turn}:"
-        x = int(maxyx[1] / 2 - len(turn_str) / 2)
+        x = maxyx[1] // 2 - len(turn_str) // 2
         self.stdscr.addstr(y, x, turn_str)
 
         y += 1
         player_str = f"{self.player.stat_str()}"
-        x = int(maxyx[1] / 2 - len(player_str) / 2)
+        x = maxyx[1] // 2 - len(player_str) // 2
         self.stdscr.addstr(y, x, player_str)
 
         hand_str_list = self.get_hand_str_list()
         for entry in hand_str_list:
-            x = int(maxyx[1] / 2 - len(entry) / 2)
+            x = maxyx[1] // 2 - len(entry) // 2
             y += 1
             self.stdscr.addstr(y, x, entry)
 
@@ -157,13 +157,13 @@ class CardBattle:
        
         enemy_str_list = self.get_enemy_str_list() 
         for entry in enemy_str_list:
-            x = int(maxyx[1] / 2 - len(entry) / 2)
+            x = maxyx[1] // 2 - len(entry) // 2
             y += 1
             self.stdscr.addstr(y, x, entry)
 
         y = constants.PROMPT_LINE + 2
         for entry in dmg_alerts:
-            x = int(maxyx[1] / 2 - len(entry) / 2)
+            x = maxyx[1] // 2 - len(entry) // 2
             y += 1
             self.stdscr.addstr(y, x, entry)
 

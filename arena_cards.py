@@ -78,7 +78,7 @@ class ArenaCards():
                 if len(menu_items) > entry_index:
                     entry = menu_items[entry_index]
                     line = f"({count + 1}) {entry.stat_str()}"
-                    x = int(maxyx[1] / 2 - len(line) / 2)
+                    x = maxyx[1] // 2 - len(line) // 2
                     self.stdscr.addstr(count, x, line)
                     count += 1
             y = constants.PROMPT_LINE
@@ -87,7 +87,7 @@ class ArenaCards():
                 prompt += ", (b)ack"
             if page < num_pages - 1:
                 prompt += ", (n)ext"
-            x = int(maxyx[1] / 2 - len(prompt) / 2)
+            x = maxyx[1] // 2 - len(prompt) // 2
             self.stdscr.addstr(y, x, prompt)
             user_choice = self.stdscr.getch()
             if user_choice == ord("e"):
@@ -113,8 +113,8 @@ class ArenaCards():
         rewards = self.generate_rewards()
         while True:
             reward_choice_prompt = f"(1) {rewards[0].name} (2) {rewards[1].name} or (e)nd: "
-            y = int(maxyx[0] / 2)
-            x = int(maxyx[1] / 2 - len(reward_choice_prompt) / 2)
+            y = maxyx[0] // 2
+            x = maxyx[1] // 2 - len(reward_choice_prompt) // 2
             self.stdscr.addstr(y, x, reward_choice_prompt)
             reward_choice = self.stdscr.getch()
             if reward_choice == ord("e"):
@@ -137,12 +137,12 @@ class ArenaCards():
         self.stdscr.clear()
         title = f"Arena Cards ({self.version})"
         maxyx = self.stdscr.getmaxyx()
-        y = int(maxyx[0] / 2)
-        x = int(maxyx[1] / 2 - len(title) / 2)
+        y = maxyx[0] // 2
+        x = maxyx[1] // 2 - len(title) // 2
         self.stdscr.addstr(y, x, title)
         prompt = "< any key to continue >"
         y += 1
-        x = int(maxyx[1] / 2 - len(prompt) / 2)
+        x = maxyx[1] // 2 - len(prompt) // 2
         self.stdscr.addstr(y, x, prompt)
         self.stdscr.refresh()
         self.stdscr.getch()
@@ -153,7 +153,7 @@ class ArenaCards():
         
         y = 1
         prompt = f"SPACE KEY to begin stage #{self.stages_cleared + 1}"
-        x = int(maxyx[1] / 2 - len(prompt) / 2)
+        x = maxyx[1] // 2 - len(prompt) // 2
         self.stdscr.addstr(y, x, prompt)
 
         # This will be very different when branching paths are implemented
@@ -165,8 +165,8 @@ class ArenaCards():
                 stage_graph_str += "[ ]"
             if i < constants.NUM_STAGES - 1:
                 stage_graph_str += "--"
-        y = int(maxyx[0] / 2)
-        x = int(maxyx[1] / 2 - len(stage_graph_str) / 2)
+        y = maxyx[0] // 2
+        x = maxyx[1] // 2 - len(stage_graph_str) // 2
         self.stdscr.addstr(y, x, stage_graph_str)
 
         self.stdscr.refresh()
@@ -180,8 +180,8 @@ class ArenaCards():
         maxyx = self.stdscr.getmaxyx()
         self.stdscr.clear()
         prompt = "You win! Any key to exit game. (placeholder)"
-        y = int(maxyx[0] / 2)
-        x = int(maxyx[1] / 2 - len(prompt) / 2)
+        y = maxyx[0] // 2
+        x = maxyx[1] // 2 - len(prompt) // 2
         self.stdscr.addstr(y, x, prompt)
         self.stdscr.refresh()
         self.stdscr.getch()
