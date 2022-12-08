@@ -142,9 +142,14 @@ class CardBattle:
         self.stdscr.addstr(y, x, turn_str)
 
         y += 1
-        player_str = f"{self.player.stat_str()}"
+        player_str = self.player.stat_str()
         x = maxyx[1] // 2 - len(player_str) // 2
         self.stdscr.addstr(y, x, player_str)
+
+        y += 1
+        deck_str = self.player.deck_str()
+        x = maxyx[1] // 2 - len(deck_str) // 2
+        self.stdscr.addstr(y, x, deck_str)
 
         hand_str_list = self.get_hand_str_list()
         for entry in hand_str_list:

@@ -20,6 +20,9 @@ class Player:
     def stat_str(self):
         return f"<{self.name}> HP: {self.hp}/{self.max_hp} DEF: {self.defense} ENERGY: {self.energy}/{self.max_energy}"
 
+    def deck_str(self):
+        return f"Total: {self.total_cards_amt()}, Draw: {len(self.draw)}, Hand: {len(self.hand)}, Discard: {len(self.discard)}"
+
     def reshuffle(self):
         assert len(self.draw) == 0
         while len(self.discard) > 0:
