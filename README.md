@@ -10,7 +10,6 @@
 * The pathway through the game's stages are linear, for now. I will include branching paths in a future update.
 * After every battle, 2 possible reward types (out of the entire set of possible reward types, which will grow with the game) are randomly selected for the player to choose from.
 * Currently, if a card can be upgraded, it can be upgraded infinitely. It's a trade-off between that and the other options for rewards in any case.
-* The current interface is put together with Python's built-in `print()` and `input()` functions. This was just for the initial prototype, and I will implement a GUI soon. 
 * No persistence of any kind just yet, although I will probably implement at least high-score keeping soon (and save states not long afterwards).
 * There is a very limited number of cards for now, and there's a decent chance of the `Basic Area Attack` dropping when the player chooses to `GAIN CARD` after a battle. Many more cards soon to come.
 * The enemies let you know what the name of the card they are going to use is, so you can prepare a little. If they are attacking then they will also indicate for how much damage, so the player can prepare their defense cards with decent foreknowledge. 
