@@ -8,6 +8,7 @@ import random
 import card
 import utility
 import curses
+import stage_graph
 
 class RewardType(Enum):
     REMOVE_CARD = 0
@@ -20,7 +21,7 @@ class ArenaCards():
         self.init_curses()
         self.player = player.Player()
         self.stages_cleared = 0
-        self.stage_graph = card_battle.generate_stage_graph(self.player, self.stdscr)
+        self.stage_graph = stage_graph.generate_stage_graph(self.player, self.stdscr)
         self.current_stage = None
         self.version = "0.0.2"
 
@@ -202,8 +203,8 @@ class ArenaCards():
         self.display_victory()
 
 if __name__ == "__main__":
+    game = ArenaCards()
     try:
-        game = ArenaCards()
         game.play()
     finally:
         game.uninit_curses()
