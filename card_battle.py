@@ -60,7 +60,7 @@ class CardBattle:
             y = 13
             #which_card = input("Enter # of card to play or (e)nd turn: ")
             prompt = "# of card to play or (e)nd turn"
-            x = int(maxyx[1] / 2 - len(prompt) /2)
+            x = int(maxyx[1] / 2 - len(prompt) / 2)
             self.stdscr.addstr(y, x, prompt)
             which_card = self.stdscr.getch()
             if which_card == ord('e'):

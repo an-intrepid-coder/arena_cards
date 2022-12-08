@@ -38,6 +38,18 @@ class ArenaCards():
         self.stdscr.keypad(False)
         curses.endwin()
 
+    def check_game_over(self):
+        if not self.player.is_alive():
+            maxyx = self.stdscr.getmaxyx()
+            self.stdscr.clear()
+            prompt = "GAME OVER (any key to exit)"
+            y = maxyx[0] // 2
+            x = maxyx[1] // 2 - len(prompt) // 2
+            self.stdscr.addstr(y, x, prompt)
+            self.stdscr.refresh()
+            self.stdscr.getch()
+            exit()
+
     def player_wins(self):
         return self.stages_cleared >= constants.NUM_STAGES
 
@@ -179,9 +191,8 @@ class ArenaCards():
         self.current_stage = self.stage_graph[0]
         while not self.player_wins():
             self.display_stage_graph()
-            check = self.player.total_cards_amt()
             self.current_stage.contents.battle()
-            assert check == self.player.total_cards_amt()
+            self.check_game_over()
             self.stages_cleared += 1
             self.rewards_loop()
             self.current_stage = self.current_stage.next_node
