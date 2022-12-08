@@ -15,6 +15,7 @@ class RewardType(Enum):
     UPGRADE_CARD = 1
     GAIN_CARD = 2
     HEAL = 3
+    MAX_HP = 4
 
 class ArenaCards(): 
     def __init__(self):
@@ -23,7 +24,7 @@ class ArenaCards():
         self.stages_cleared = 0
         self.stage_graph = stage_graph.generate_stage_graph(self.player, self.stdscr)
         self.current_stage = None
-        self.version = "0.0.2"
+        self.version = "0.0.3"
 
     def init_curses(self):
         self.stdscr = curses.initscr()
@@ -56,7 +57,10 @@ class ArenaCards():
 
     # Returns two reward types in a tuple out of all possible reward types:
     def generate_rewards(self):
-        rewards = [RewardType.REMOVE_CARD, RewardType.UPGRADE_CARD, RewardType.GAIN_CARD, RewardType.HEAL]
+        rewards = [
+            RewardType.REMOVE_CARD, RewardType.UPGRADE_CARD, RewardType.GAIN_CARD, RewardType.HEAL,
+            RewardType.MAX_HP,
+        ]
         random.shuffle(rewards)
         first_pick = rewards.pop()
         second_pick = rewards.pop()
@@ -132,6 +136,10 @@ class ArenaCards():
             elif pick == RewardType.HEAL:
                 heal_amt = utility.generate_fuzzed_value(constants.BASE_HEAL_AMOUNT, constants.HEAL_FUZZ_MULTIPLIER)
                 self.player.change_hp(heal_amt)
+            elif pick == RewardType.MAX_HP:
+                hp_amt = utility.generate_fuzzed_value(constants.BASE_HEAL_AMOUNT, constants.HEAL_FUZZ_MULTIPLIER)
+                self.player.max_hp += hp_amt
+                self.player.change_hp(hp_amt)
             break
 
     def display_title(self):
