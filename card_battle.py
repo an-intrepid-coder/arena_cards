@@ -58,7 +58,6 @@ class CardBattle:
         while True:
             maxyx = self.stdscr.getmaxyx()
             y = 13
-            #which_card = input("Enter # of card to play or (e)nd turn: ")
             prompt = "# of card to play or (e)nd turn"
             x = maxyx[1] // 2 - len(prompt) // 2
             self.stdscr.addstr(y, x, prompt)
@@ -186,7 +185,6 @@ class CardBattle:
                 self.display_battle(dmg_alerts)
                 if not self.handle_input():
                     break
-                
             self.player.discard_hand()
             dmg_alerts = self.enemy_actions()
             self.turn += 1

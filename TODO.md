@@ -1,6 +1,7 @@
 # TODO (in no particular order)
 
-* GUI 
+* GUI (probably Kivy but not totally sure yet)
+* console log of some sort
 * bot play
 * background mode
 * Boss fights
@@ -17,5 +18,4 @@
 * more status cards
 * more attack cards 
 * more defense cards
-* vary enemies by stage level
 
