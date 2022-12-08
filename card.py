@@ -1,4 +1,5 @@
 import random
+import constants
 
 # Builds a starter deck of 5 Basic Attack, 5 Basic Defend, and 3 Hesitation
 def build_starter_deck():
@@ -84,4 +85,10 @@ class Hesitation(Card):
         self.name = "Hesitation"
         self.playable = False
         self.upgradeable = False
+
+def generate_gain_card_choices():
+    choices = [BasicAttack(), BasicDefend()] # for now
+    if random.random() <= constants.BASIC_AOE_DROP_CHANCE:
+        choices.append(BasicAreaAttack())
+    return choices
 

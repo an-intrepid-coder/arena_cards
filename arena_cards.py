@@ -49,10 +49,11 @@ class ArenaCards():
         second_pick = rewards.pop()
         return (first_pick, second_pick)
 
-    def upgrade_card_loop(self):
-        upgradeable = self.player.get_upgradeable_cards()
+    def paged_menu_loop(self, menu_items, context_str, action): #hmmmmm
+    # menu_items is a list of card references
+    # action is a function that takes a card and does something to it
         page = 0
-        draw_divmod = divmod(len(upgradeable), constants.PAGE_SIZE)
+        draw_divmod = divmod(len(menu_items), constants.PAGE_SIZE)
         num_pages = draw_divmod[0]
         if draw_divmod[1] > 0:
             num_pages += 1
@@ -62,14 +63,14 @@ class ArenaCards():
             maxyx = self.stdscr.getmaxyx()
             for i in range(constants.PAGE_SIZE):
                 entry_index = i + constants.PAGE_SIZE * page
-                if len(upgradeable) > entry_index:
-                    entry = upgradeable[entry_index]
+                if len(menu_items) > entry_index:
+                    entry = menu_items[entry_index]
                     line = f"({count + 1}) {entry.stat_str()}"
                     x = int(maxyx[1] / 2 - len(line) / 2)
                     self.stdscr.addstr(count, x, line)
                     count += 1
             y = constants.PROMPT_LINE
-            prompt = f"(page {page + 1}/{num_pages}) # of card to remove, (e)nd"
+            prompt = f"(page {page + 1}/{num_pages}) # of card to {context_str}, (e)nd"
             if page > 0:
                 prompt += ", (b)ack"
             if page < num_pages - 1:
@@ -90,83 +91,8 @@ class ArenaCards():
             if not user_choice in range(48, 58):
                 continue
             index = int(chr(user_choice)) - 1 + constants.PAGE_SIZE * page
-            if len(upgradeable) > entry_index:
-                upgradeable[index].upgrade()
-            #print(f"REMOVED: {target.stat_str()}") # TODO: Console log?
-            break
-
-    #def paged_menu_loop(self): # TODO
-
-    def remove_card_loop(self):
-        page = 0
-        draw_divmod = divmod(len(self.player.draw), constants.PAGE_SIZE)
-        num_pages = draw_divmod[0]
-        if draw_divmod[1] > 0:
-            num_pages += 1
-        while True:
-            count = 0
-            self.stdscr.clear()
-            maxyx = self.stdscr.getmaxyx()
-            for i in range(constants.PAGE_SIZE):
-                entry_index = i + constants.PAGE_SIZE * page
-                if len(self.player.draw) > entry_index:
-                    entry = self.player.draw[entry_index]
-                    line = f"({count + 1}) {entry.stat_str()}"
-                    x = int(maxyx[1] / 2 - len(line) / 2)
-                    self.stdscr.addstr(count, x, line)
-                    count += 1
-            y = constants.PROMPT_LINE
-            prompt = f"(page {page + 1}/{num_pages}) # of card to remove, (e)nd"
-            if page > 0:
-                prompt += ", (b)ack"
-            if page < num_pages - 1:
-                prompt += ", (n)ext"
-            x = int(maxyx[1] / 2 - len(prompt) / 2)
-            self.stdscr.addstr(y, x, prompt)
-            user_choice = self.stdscr.getch()
-            if user_choice == ord("e"):
-                break
-            if user_choice == ord("b"): 
-                if page > 0:
-                    page -= 1
-                continue
-            if user_choice == ord("n"):
-                if page < num_pages - 1:
-                    page += 1
-                continue
-            if not user_choice in range(48, 58):
-                continue
-            index = int(chr(user_choice)) - 1 + constants.PAGE_SIZE * page
-            if len(self.player.draw) > index:
-                target = self.player.draw[index]
-                self.player.draw.remove(target)
-                #print(f"REMOVED: {target.stat_str()}") # TODO: Console log?
-            break
-
-    def gain_card_loop(self):
-        self.stdscr.clear()
-        maxyx = self.stdscr.getmaxyx()
-        count = 0
-        choices = [card.BasicAttack(), card.BasicDefend()] # for now
-        if random.random() <= constants.BASIC_AOE_DROP_CHANCE:
-            choices.append(card.BasicAreaAttack())
-        for entry in choices:
-            line = f"({count + 1}) {entry.stat_str()}"
-            x = int(maxyx[1] / 2 - len(line) / 2)
-            self.stdscr.addstr(count, x, line)
-            count += 1
-        while True:
-            prompt = "# of card to gain or (e)nd"
-            x = int(maxyx[1] / 2 - len(prompt) / 2)
-            self.stdscr.addstr(count, x, prompt)
-            user_choice = self.stdscr.getch()
-            if user_choice == ord("e"):
-                break
-            if not user_choice in range(48, 58):
-                continue
-            index = int(chr(user_choice)) - 1
-            self.player.draw.append(choices[index])
-            # print(f"GAINED: {choices[index].stat_str()}") # TODO: Console log?
+            if len(menu_items) > entry_index:
+                action(menu_items[index])
             break
 
     def rewards_loop(self):
@@ -182,19 +108,17 @@ class ArenaCards():
             if reward_choice == ord("e"):
                 break
             elif not (reward_choice == ord("1") or reward_choice == ord("2")):
-                #print("Invalid input!") # TODO: Console log?
                 continue
             pick = rewards[int(chr(reward_choice)) - 1]
             if pick == RewardType.UPGRADE_CARD:
-                self.upgrade_card_loop()
+                self.paged_menu_loop(self.player.get_upgradeable_cards(), "upgrade", lambda x: x.upgrade())
             elif pick == RewardType.REMOVE_CARD:
-                self.remove_card_loop()
+                self.paged_menu_loop(self.player.draw, "remove", lambda x: self.player.draw.remove(x))
             elif pick == RewardType.GAIN_CARD:
-                self.gain_card_loop() 
+                self.paged_menu_loop(card.generate_gain_card_choices(), "gain", lambda x: self.player.draw.append(x))
             elif pick == RewardType.HEAL:
                 heal_amt = utility.generate_fuzzed_value(constants.BASE_HEAL_AMOUNT, constants.HEAL_FUZZ_MULTIPLIER)
                 self.player.change_hp(heal_amt)
-                # print(f"{self.player.name} heals for {heal_amt} HP!") # TODO: Console log?
             break
 
     def display_title(self):
