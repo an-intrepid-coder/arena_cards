@@ -152,7 +152,7 @@ class ArenaCards():
         self.stdscr.clear()
         
         y = 1
-        prompt = f"SPACE KEY to begin stage #{self.stages_cleared + 1}"
+        prompt = f"SPACE KEY to begin stage #{self.stages_cleared + 1} or view (d)eck"
         x = maxyx[1] // 2 - len(prompt) // 2
         self.stdscr.addstr(y, x, prompt)
 
@@ -174,6 +174,9 @@ class ArenaCards():
         while True:
             user_input = self.stdscr.getch()
             if user_input == constants.ASCII_SPACE:
+                break
+            elif user_input == ord("d"):
+                self.paged_menu_loop(self.player.draw, "", lambda x: None)
                 break
 
     def display_victory(self):
