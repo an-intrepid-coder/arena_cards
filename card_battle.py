@@ -4,11 +4,11 @@ import constants
 import curses
 
 class CardBattle:
-    def __init__(self, player, enemies, stdscr): 
+    def __init__(self, player, enemies, game): 
         self.player = player
         self.enemies = enemies
         self.turn = 1
-        self.stdscr = stdscr
+        self.game = game
        
     def battle_won(self):
         for enemy in self.enemies:
@@ -43,24 +43,24 @@ class CardBattle:
         return enemy_str_list
 
     def clear_prompt_lines(self):
-        maxyx = self.stdscr.getmaxyx()
+        maxyx = self.game.stdscr.getmaxyx()
         line = constants.PROMPT_LINE
         while line < maxyx[0]:
             blank = ""
             for x in range(maxyx[1] - 1):
                 blank += " "
-            self.stdscr.addstr(line, 0, blank)
+            self.game.stdscr.addstr(line, 0, blank)
             line += 1
 
     # Returns False if the player ended their turn
     def handle_input(self):
         while True:
-            maxyx = self.stdscr.getmaxyx()
+            maxyx = self.game.stdscr.getmaxyx()
             y = 13
             prompt = "# of card to play or (e)nd turn"
             x = maxyx[1] // 2 - len(prompt) // 2
-            self.stdscr.addstr(y, x, prompt)
-            which_card = self.stdscr.getch()
+            self.game.stdscr.addstr(y, x, prompt)
+            which_card = self.game.stdscr.getch()
             if which_card == ord('e'):
                 return False
             if not which_card in range(48, 58):
@@ -78,8 +78,8 @@ class CardBattle:
                     self.clear_prompt_lines()
                     prompt = "enter # of enemy to attack"
                     x = maxyx[1] // 2 - len(prompt) // 2
-                    self.stdscr.addstr(y, x, prompt)
-                    which_enemy = self.stdscr.getch()
+                    self.game.stdscr.addstr(y, x, prompt)
+                    which_enemy = self.game.stdscr.getch()
                     index = int(chr(which_enemy)) - 1
                     if index >= len(self.enemies) or index < 0:
                         continue
@@ -132,29 +132,29 @@ class CardBattle:
         return dmg_alerts
 
     def display_battle(self, dmg_alerts):
-        self.stdscr.clear()
-        maxyx = self.stdscr.getmaxyx()
+        self.game.stdscr.clear()
+        maxyx = self.game.stdscr.getmaxyx()
         
         y = 0
         turn_str = f"Turn {self.turn}:"
         x = maxyx[1] // 2 - len(turn_str) // 2
-        self.stdscr.addstr(y, x, turn_str)
+        self.game.stdscr.addstr(y, x, turn_str)
 
         y += 1
         player_str = self.player.stat_str()
         x = maxyx[1] // 2 - len(player_str) // 2
-        self.stdscr.addstr(y, x, player_str)
+        self.game.stdscr.addstr(y, x, player_str)
 
         y += 1
         deck_str = self.player.deck_str()
         x = maxyx[1] // 2 - len(deck_str) // 2
-        self.stdscr.addstr(y, x, deck_str)
+        self.game.stdscr.addstr(y, x, deck_str)
 
         hand_str_list = self.get_hand_str_list()
         for entry in hand_str_list:
             x = maxyx[1] // 2 - len(entry) // 2
             y += 1
-            self.stdscr.addstr(y, x, entry)
+            self.game.stdscr.addstr(y, x, entry)
 
         y += 1
        
@@ -162,15 +162,15 @@ class CardBattle:
         for entry in enemy_str_list:
             x = maxyx[1] // 2 - len(entry) // 2
             y += 1
-            self.stdscr.addstr(y, x, entry)
+            self.game.stdscr.addstr(y, x, entry)
 
         y = constants.PROMPT_LINE + 2
         for entry in dmg_alerts:
             x = maxyx[1] // 2 - len(entry) // 2
             y += 1
-            self.stdscr.addstr(y, x, entry)
+            self.game.stdscr.addstr(y, x, entry)
 
-        self.stdscr.refresh()
+        self.game.stdscr.refresh()
 
     def battle(self): 
         self.player.reset_deck()

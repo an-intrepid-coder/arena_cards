@@ -9,6 +9,7 @@ import card
 import utility
 import curses
 import stage_graph
+import enemy
 
 class RewardType(Enum):
     REMOVE_CARD = 0
@@ -22,9 +23,21 @@ class ArenaCards():
         self.init_curses()
         self.player = player.Player()
         self.stages_cleared = 0
-        self.stage_graph = stage_graph.generate_stage_graph(self.player, self.stdscr)
+        self.stage_graph = self.generate_stage_graph()
         self.current_stage = None
         self.version = "0.0.3"
+        self.enemies_defeated = 0
+
+    def generate_stage_graph(self):
+        root = stage_graph.StageGraphNode(card_battle.CardBattle(self.player, enemy.generate_enemies(stage=1), self), None, None)
+        graph = [root]
+        for i in range(constants.NUM_STAGES):
+            stage_level = i + 1
+            next_stage = card_battle.CardBattle(self.player, enemy.generate_enemies(stage_level), self)
+            next_node = stage_graph.StageGraphNode(next_stage, graph[i], None)
+            graph[i].next_node = next_node
+            graph.append(next_node)
+        return graph
 
     def init_curses(self):
         self.stdscr = curses.initscr()
@@ -66,9 +79,9 @@ class ArenaCards():
         second_pick = rewards.pop()
         return (first_pick, second_pick)
 
-    def paged_menu_loop(self, menu_items, context_str, action): #hmmmmm
-    # menu_items is a list of card references
-    # action is a function that takes a card and does something to it
+    def paged_menu_loop(self, menu_items, context_str, action):
+        # menu_items is a list of card references
+        # action is a function that takes a card and does something to it
         page = 0
         draw_divmod = divmod(len(menu_items), constants.PAGE_SIZE)
         num_pages = draw_divmod[0]
@@ -165,19 +178,25 @@ class ArenaCards():
         x = maxyx[1] // 2 - len(prompt) // 2
         self.stdscr.addstr(y, x, prompt)
 
-        # This will be very different when branching paths are implemented
-        stage_graph_str = ""
-        for i in range(constants.NUM_STAGES):
-            if self.stages_cleared > i:
-                stage_graph_str += "[+]"
+        stage_graph_str_list = ["" for x in range(constants.NUM_STAGES // 10)]
+        index = 0
+        count = 0
+        while count < constants.NUM_STAGES:
+            if count > 0 and count % 10 == 0:
+                index += 1
+            if self.stages_cleared > count:
+                stage_graph_str_list[index] += "[+]"
             else:
-                stage_graph_str += "[ ]"
-            if i < constants.NUM_STAGES - 1:
-                stage_graph_str += "--"
-        y = maxyx[0] // 2
-        x = maxyx[1] // 2 - len(stage_graph_str) // 2
-        self.stdscr.addstr(y, x, stage_graph_str)
-
+                stage_graph_str_list[index] += "[ ]"
+            if count < constants.NUM_STAGES - 1:
+                stage_graph_str_list[index] += "--"
+            count += 1
+        y = maxyx[0] // 2 - 1
+        for stage_graph_str in stage_graph_str_list:
+            x = maxyx[1] // 2 - len(stage_graph_str) // 2
+            self.stdscr.addstr(y, x, stage_graph_str)
+            y += 1
+            
         self.stdscr.refresh()
 
         while True:

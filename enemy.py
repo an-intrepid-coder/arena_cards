@@ -87,7 +87,7 @@ class AggroBrawler(Enemy):
 def generate_enemies(stage):  
     enemy_min = 1
     enemy_max = 3
-    if stage > 3:
+    if stage > constants.NUM_STAGES // 10:
         enemy_max += 1
     num_enemies = random.randrange(enemy_min, enemy_max)
     enemy_list = []
