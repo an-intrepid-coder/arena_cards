@@ -10,6 +10,7 @@ import utility
 import curses
 import stage_graph
 import enemy
+import sys
 
 class RewardType(Enum):
     REMOVE_CARD = 0
@@ -18,10 +19,30 @@ class RewardType(Enum):
     HEAL = 3
     MAX_HP = 4
 
+# If the player gave the "--name" argument and included a name afterwards, this will
+# return the given name. Otherwise returns False.
+def used_name_arg():
+    count = 0
+    for arg in sys.argv:
+        if count < len(sys.argv) + 1 and arg == "--name":
+            return sys.argv[count + 1]
+        count += 1
+    return False
+
+# Returns True if the player used the "--score" arg. False otherwise.    
+def used_scores_arg():
+    for arg in sys.argv:
+        if arg == "--scores":
+            return True
+    return False
+
 class ArenaCards(): 
     def __init__(self):
         self.init_curses()
         self.player = player.Player()
+        name = used_name_arg()
+        if name:
+            self.player.name = name
         self.stages_cleared = 0
         self.stage_graph = self.generate_stage_graph()
         self.current_stage = None
@@ -297,6 +318,10 @@ class ArenaCards():
 
 if __name__ == "__main__":
     game = ArenaCards()
+    if used_scores_arg():
+        game.display_high_scores()
+        game.uninit_curses()
+        exit()
     try:
         game.play()
     finally:
