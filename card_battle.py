@@ -92,6 +92,8 @@ class CardBattle:
                         dmg = 0
                     target.change_hp(-dmg)
                     target.change_defense(-raw_dmg)
+                    if not target.is_alive():
+                        self.game.enemies_defeated += 1
                 else:
                     dmgs = []
                     for target in self.enemies:
@@ -103,6 +105,8 @@ class CardBattle:
                                 dmg = 0
                             target.change_hp(-dmg)
                             target.change_defense(-raw_dmg)
+                            if not target.is_alive():
+                                self.game.enemies_defeated += 1
             if card_to_play.defense is not None:
                 self.player.change_defense(card_to_play.defense)
             break

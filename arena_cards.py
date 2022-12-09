@@ -45,7 +45,6 @@ class ArenaCards():
         curses.cbreak()
         self.stdscr.keypad(True)
         curses.curs_set(0)
-        # TODO: colors!
 
     def uninit_curses(self):
         curses.echo()
@@ -55,14 +54,9 @@ class ArenaCards():
 
     def check_game_over(self):
         if not self.player.is_alive():
-            maxyx = self.stdscr.getmaxyx()
-            self.stdscr.clear()
-            prompt = "GAME OVER (any key to exit)"
-            y = maxyx[0] // 2
-            x = maxyx[1] // 2 - len(prompt) // 2
-            self.stdscr.addstr(y, x, prompt)
-            self.stdscr.refresh()
-            self.stdscr.getch()
+            self.display_end_stats()
+            self.update_high_scores()
+            self.display_high_scores()
             exit()
 
     def player_wins(self):
@@ -207,15 +201,85 @@ class ArenaCards():
                 self.paged_menu_loop(self.player.draw, "", lambda x: None)
                 break
 
-    def display_victory(self):
+    def calculate_score(self):
+        from_stages = self.stages_cleared * constants.POINTS_PER_STAGE
+        from_enemies = self.enemies_defeated * constants.POINTS_PER_ENEMY
+        return from_stages + from_enemies
+
+    def display_end_stats(self, victory=False):
         maxyx = self.stdscr.getmaxyx()
         self.stdscr.clear()
-        prompt = "You win! Any key to exit game. (placeholder)"
-        y = maxyx[0] // 2
+
+        if victory:
+            prompt = "You win! Any key to exit game."
+        else:
+            prompt = "You lose! Any key to exit game."
+        y = 1
         x = maxyx[1] // 2 - len(prompt) // 2
         self.stdscr.addstr(y, x, prompt)
+
+        stages_str = f"Stages Cleared: {self.stages_cleared}"
+        y += 2
+        x = maxyx[1] // 2 - len(stages_str) // 2
+        self.stdscr.addstr(y, x, stages_str)
+
+        enemies_str = f"Enemies Defeated: {self.enemies_defeated}"
+        y += 1
+        x = maxyx[1] // 2 - len(enemies_str) // 2
+        self.stdscr.addstr(y, x, enemies_str)
+
+        score_str = f"Score: {self.calculate_score()}"
+        y += 1
+        x = maxyx[1] // 2 - len(score_str) // 2
+        self.stdscr.addstr(y, x, score_str)
+
         self.stdscr.refresh()
         self.stdscr.getch()
+
+    def display_high_scores(self):
+        self.stdscr.clear()
+        scores = []
+        try:
+            with open("scores", "r", encoding="utf-8") as f: 
+                score_lines = f.readlines()
+                for line in score_lines:
+                    chunked = line.split(":")
+                    scores.append(f"{chunked[0]}: {chunked[1]}")
+        except FileNotFoundError:
+            pass
+        # Will display only the top 20:
+        maxyx = self.stdscr.getmaxyx()
+        prompt = "HIGH SCORES:"
+        x = maxyx[1] // 2 - len(prompt) // 2
+        self.stdscr.addstr(0, x, prompt)
+        y = 1
+        for i in range(20):
+            if len(scores) > i:
+                x = maxyx[1] // 2 - len(scores[i]) // 2
+                self.stdscr.addstr(y, x, scores[i])
+                y += 1
+        y += 1
+        prompt = "any key to exit"
+        x = maxyx[1] // 2 - len(prompt) // 2
+        self.stdscr.addstr(y, x, prompt)
+        self.stdscr.getch()
+
+    def update_high_scores(self):
+        scores = []
+        try:
+            with open("scores", "r", encoding="utf-8") as f: 
+                score_lines = f.readlines()
+                for line in score_lines:
+                    chunked = line.split(":")
+                    scores.append((chunked[0], int(chunked[1])))
+        except FileNotFoundError:
+            pass
+        scores.append((self.player.name, self.calculate_score()))
+        scores.sort(key=lambda x: x[1])
+        with open("scores", "w", encoding="utf-8") as f:
+            while len(scores) > 0:
+                score = scores.pop()
+                f.write(f"{score[0]}:{score[1]}\n")
 
     def play(self):
         self.display_title()
@@ -227,7 +291,9 @@ class ArenaCards():
             self.stages_cleared += 1
             self.rewards_loop()
             self.current_stage = self.current_stage.next_node
-        self.display_victory()
+        self.display_end_stats(victory=True)
+        self.update_high_scores()
+        self.display_high_scores()
 
 if __name__ == "__main__":
     game = ArenaCards()
