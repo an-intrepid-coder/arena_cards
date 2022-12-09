@@ -199,8 +199,11 @@ class ArenaCards():
         while count < constants.NUM_STAGES:
             if count > 0 and count % 10 == 0:
                 index += 1
+                stage_graph_str_list[index] += "-"
             if self.stages_cleared > count:
                 stage_graph_str_list[index] += "[+]"
+            elif self.stages_cleared == count:
+                stage_graph_str_list[index] += "[>]"
             else:
                 stage_graph_str_list[index] += "[ ]"
             if count < constants.NUM_STAGES - 1:
